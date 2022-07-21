@@ -58,6 +58,17 @@ namespace VanillaSSinn3r
 			Form1.Sharp.Write<float>(Form1.FOVAddy, 1.5708f, false);
 		}
 
+		public static bool InProcIgnoreList(string processName)
+		{
+			string[] procIgnoreList = { "wowreeb" };
+			foreach (string procIgnore in procIgnoreList)
+            {
+				if(processName.ToLower().Contains(procIgnore.ToLower()))
+				{ return true; }
+            }
+			return false;
+		}
+
 		public static Process[] GetProcessesByName(string processName, string machineName)
 		{
 			if (processName == null)
@@ -69,7 +80,7 @@ namespace VanillaSSinn3r
 			ArrayList arrayList = new ArrayList();
 			for (int i = 0; i < processes.Length; i++)
 			{
-				if (processes[i].ProcessName.ToLower().Contains(processName.ToLower()))
+				if (processes[i].ProcessName.ToLower().Contains(processName.ToLower()) && !InProcIgnoreList(processes[i].ProcessName))
 				{
 					arrayList.Add(processes[i]);
 				}
