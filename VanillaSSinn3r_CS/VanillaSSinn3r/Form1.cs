@@ -26,10 +26,14 @@ namespace VanillaSSinn3r
 
 		public static string Version;
 
+		public static float GameDefaultNameplateRange;
+
+		public static float GameDefaultFOV;
+
 		public Form1()
 		{
 			InitializeComponent();
-			Text = "WoW Vanilla/TBC Tool By SSinist3r";
+			Text = "WoW Vanilla/TBC/WotLK Tool By SSinist3r";
 			Load += new EventHandler(Form1_Load);
 		}
 
@@ -54,8 +58,8 @@ namespace VanillaSSinn3r
 			Settings.Default.DefaultRangeBool = namePlateCheckBox.Checked;
 			Settings.Default.DefaultFOVBool = fovCheckBox.Checked;
 			Settings.Default.Save();
-			Form1.Sharp.Write<float>(Form1.RangeAddy, 400f, false);
-			Form1.Sharp.Write<float>(Form1.FOVAddy, 1.5708f, false);
+			Form1.Sharp.Write<float>(Form1.RangeAddy, GameDefaultNameplateRange, false);
+			Form1.Sharp.Write<float>(Form1.FOVAddy, GameDefaultFOV, false);
 		}
 
 		public static bool InProcIgnoreList(string processName)
@@ -220,18 +224,24 @@ namespace VanillaSSinn3r
 					Print("World of Warcraft [" + Form1.Version + "] detected!");
 					Form1.RangeAddy = new IntPtr(12900744); // 0xC4D988
 					Form1.FOVAddy = new IntPtr(8423860); // 0x8089B4
+					GameDefaultNameplateRange = (float)Form1.Sharp.Read<float>(Form1.RangeAddy, false);
+					GameDefaultFOV = (float)Form1.Sharp.Read<float>(Form1.FOVAddy, false);
 				}
 				else if (Form1.Version.Contains("8606")) // TBC
 				{
 					Print("World of Warcraft [" + Form1.Version + "] detected!");
 					Form1.RangeAddy = new IntPtr(12209040); // 0xBA4B90
 					Form1.FOVAddy = new IntPtr(9132548); // 0x8b5a04
+					GameDefaultNameplateRange = (float)Form1.Sharp.Read<float>(Form1.RangeAddy, false);
+					GameDefaultFOV = (float)Form1.Sharp.Read<float>(Form1.FOVAddy, false);
 				}
 				else if (Form1.Version.Contains("12340")) // Wotlk
 				{
 					Print("World of Warcraft [" + Form1.Version + "] detected!");
-					Form1.RangeAddy = new IntPtr(12209040); // 0xBA4B90 // still need to find this
+					Form1.RangeAddy = new IntPtr(11381372); // 0xADAA7C
 					Form1.FOVAddy = new IntPtr(10390920); // 0x9e8d88
+					GameDefaultNameplateRange = (float)Form1.Sharp.Read<float>(Form1.RangeAddy, false);
+					GameDefaultFOV = (float)Form1.Sharp.Read<float>(Form1.FOVAddy, false);
 				}
 				else
 				{
