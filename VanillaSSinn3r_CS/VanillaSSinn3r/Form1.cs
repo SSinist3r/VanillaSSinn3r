@@ -4,6 +4,7 @@ using System.Management;
 using Binarysharp.MemoryManagement;
 using System.Diagnostics;
 using VanillaSSinn3r.Properties;
+using System.Collections;
 
 namespace VanillaSSinn3r
 {
@@ -57,13 +58,40 @@ namespace VanillaSSinn3r
 			Form1.Sharp.Write<float>(Form1.FOVAddy, 1.5708f, false);
 		}
 
+		public static Process[] GetProcessesByName(string processName, string machineName)
+		{
+			if (processName == null)
+			{
+				processName = string.Empty;
+			}
+
+			Process[] processes = Process.GetProcesses(machineName);
+			ArrayList arrayList = new ArrayList();
+			for (int i = 0; i < processes.Length; i++)
+			{
+				if (processes[i].ProcessName.ToLower().Contains(processName.ToLower()))
+				{
+					arrayList.Add(processes[i]);
+				}
+				else
+				{
+					processes[i].Dispose();
+				}
+			}
+
+			Process[] array = new Process[arrayList.Count];
+			arrayList.CopyTo(array, 0);
+			return array;
+		}
+
 		private void Init()
 		{
 			processBox.Invoke(new MethodInvoker(delegate ()
 			{
 				processBox.Items.Clear();
 			}));
-			Form1.Proc = Process.GetProcessesByName("Wow");
+			// Form1.Proc = Process.GetProcessesByName("Wow");
+			Form1.Proc = GetProcessesByName("Wow", ".");
 			if (Form1.Proc.Length == 0)
 			{
 				return;
@@ -74,7 +102,7 @@ namespace VanillaSSinn3r
 				Process instance = proc[i];
 				processBox.Invoke(new MethodInvoker(delegate ()
 				{
-					processBox.Items.Add("World of Warcraft [" + instance.Id + "]");
+					processBox.Items.Add(instance.ProcessName + " [" + instance.Id + "]");
 				}));
 			}
 			processBox.Invoke(new MethodInvoker(delegate ()
@@ -95,7 +123,7 @@ namespace VanillaSSinn3r
 
 		public void OnProcessStart(object sender, EventArrivedEventArgs e)
 		{
-			if (e.NewEvent.Properties["ProcessName"].Value.ToString().ToLower() == "wow.exe")
+			if (e.NewEvent.Properties["ProcessName"].Value.ToString().ToLower().Contains("wow")) // == "wow.exe")
 			{
 				Init();
 			}
@@ -105,7 +133,7 @@ namespace VanillaSSinn3r
 		{
 			string text = e.NewEvent.Properties["ProcessName"].Value.ToString();
 			int num = int.Parse(e.NewEvent.Properties["ProcessID"].Value.ToString());
-			if (text.ToLower() == "wow.exe")
+			if (text.ToLower().Contains("wow")) // == "wow.exe")
 			{
 				Init();
 			}
