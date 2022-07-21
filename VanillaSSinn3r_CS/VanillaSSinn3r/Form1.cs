@@ -169,7 +169,7 @@ namespace VanillaSSinn3r
 		public void infoPrint(string forText, float value)
 		{
 			if(forText.Contains("nameplate"))
-				Print("Nameplate Range: " + (int)((value / 100)*2.75) + " yards");
+				Print("Nameplate Range: " + (Math.Sqrt(value)).ToString("F") + " yards");
 			else if (forText.Contains("fov"))
 				Print("FOV: " + value + "	(Use In Game: \' /console ReloadUI \')");
 		}
