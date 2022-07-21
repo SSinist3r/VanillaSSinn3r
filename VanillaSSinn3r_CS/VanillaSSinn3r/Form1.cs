@@ -51,15 +51,7 @@ namespace VanillaSSinn3r
 				return;
 			}
 			Form1.AppClosing = true;
-			if(namePlateCheckBox.Checked)
-				Settings.Default.DefaultRange = (int)namePlateRangeSlider.Value;
-			if(fovCheckBox.Checked)
-				Settings.Default.DefaultFOV = float.Parse(fovTextBox.Text);
-			Settings.Default.DefaultRangeBool = namePlateCheckBox.Checked;
-			Settings.Default.DefaultFOVBool = fovCheckBox.Checked;
-			Settings.Default.Save();
-			Form1.Sharp.Write<float>(Form1.RangeAddy, GameDefaultNameplateRange, false);
-			Form1.Sharp.Write<float>(Form1.FOVAddy, GameDefaultFOV, false);
+			save_n_reset();
 		}
 
 		public static bool InProcIgnoreList(string processName)
@@ -328,6 +320,15 @@ namespace VanillaSSinn3r
 			}
 			infoBox.Text = "";
 			Print("======= Resetting Values To Game Default/Original =======");
+			save_n_reset();
+			infoPrint("nameplate", GameDefaultNameplateRange);
+			infoPrint("fov", GameDefaultFOV);
+			Form1.Attached = false;
+			Print("==================== Detached ====================");
+		}
+
+		private void save_n_reset()
+		{
 			if (namePlateCheckBox.Checked)
 				Settings.Default.DefaultRange = (int)namePlateRangeSlider.Value;
 			if (fovCheckBox.Checked)
@@ -337,10 +338,7 @@ namespace VanillaSSinn3r
 			Settings.Default.Save();
 			Form1.Sharp.Write<float>(Form1.RangeAddy, GameDefaultNameplateRange, false);
 			Form1.Sharp.Write<float>(Form1.FOVAddy, GameDefaultFOV, false);
-			infoPrint("nameplate", GameDefaultNameplateRange);
-			infoPrint("fov", GameDefaultFOV);
-			Form1.Attached = false;
-			Print("==================== Detached ====================");
 		}
-    }
+
+	}
 }
