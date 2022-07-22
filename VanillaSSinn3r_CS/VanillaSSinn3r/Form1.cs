@@ -5,6 +5,9 @@ using Binarysharp.MemoryManagement;
 using System.Diagnostics;
 using VanillaSSinn3r.Properties;
 using System.Collections;
+using System.Collections.Generic;
+using System.Threading;
+using System.IO;
 
 namespace VanillaSSinn3r
 {
@@ -22,6 +25,8 @@ namespace VanillaSSinn3r
 
 		public static IntPtr FOVAddy;
 
+		public static IntPtr[] CamDistAddy = new IntPtr[2];
+
 		public static int SelectedProcess;
 
 		public static string Version;
@@ -29,6 +34,18 @@ namespace VanillaSSinn3r
 		public static float GameDefaultNameplateRange;
 
 		public static float GameDefaultFOV;
+
+		public static float GameDefaultCameraDistance;
+
+		public static float GameDefaultCameraDistanceLimit;
+
+		public static bool versionChecked = false;
+
+		public static IntPtr tmpPtr;
+
+		ThreadStart delegateRetrieveData;
+
+		Thread mainThread;
 
 		public Form1()
 		{
@@ -168,6 +185,8 @@ namespace VanillaSSinn3r
 				Print("Nameplate Range: " + (Math.Sqrt(value)).ToString("F") + " yards");
 			else if (forText.Contains("fov"))
 				Print("FOV: " + value + "	(Use In Game: \' /console ReloadUI \')");
+			else if (forText.Contains("camera"))
+				Print("Camera Distance: " + value);
 		}
 
 
@@ -213,42 +232,13 @@ namespace VanillaSSinn3r
 				Form1.Sharp = new MemorySharp(Form1.SelectedProcess);
 				Form1.Attached = true;
 				Print("Successfully attached to WoW [" + Form1.SelectedProcess + "]");
-				if (Form1.Version.Contains("5875")) // Vanilla
-				{
-					Print("World of Warcraft [" + Form1.Version + "] detected!");
-					Form1.RangeAddy = new IntPtr(12900744); // 0xC4D988
-					Form1.FOVAddy = new IntPtr(8423860); // 0x8089B4
-					GameDefaultNameplateRange = (float)Form1.Sharp.Read<float>(Form1.RangeAddy, false);
-					GameDefaultFOV = (float)Form1.Sharp.Read<float>(Form1.FOVAddy, false);
-				}
-				else if (Form1.Version.Contains("8606")) // TBC
-				{
-					Print("World of Warcraft [" + Form1.Version + "] detected!");
-					Form1.RangeAddy = new IntPtr(12209040); // 0xBA4B90
-					Form1.FOVAddy = new IntPtr(9132548); // 0x8b5a04
-					GameDefaultNameplateRange = (float)Form1.Sharp.Read<float>(Form1.RangeAddy, false);
-					GameDefaultFOV = (float)Form1.Sharp.Read<float>(Form1.FOVAddy, false);
-				}
-				else if (Form1.Version.Contains("12340")) // Wotlk
-				{
-					Print("World of Warcraft [" + Form1.Version + "] detected!");
-					Form1.RangeAddy = new IntPtr(11381372); // 0xADAA7C
-					Form1.FOVAddy = new IntPtr(10390920); // 0x9e8d88
-					GameDefaultNameplateRange = (float)Form1.Sharp.Read<float>(Form1.RangeAddy, false);
-					GameDefaultFOV = (float)Form1.Sharp.Read<float>(Form1.FOVAddy, false);
-				}
-				else
-				{
-					Print("World of Warcraft [" + Form1.Version + "] is not supported.");
-					Form1.Sharp.Handle.Close();
-					Form1.Sharp.Dispose();
-					Form1.Attached = false;
-					Print("Detached from WoW [" + Form1.SelectedProcess + "]");
-				}
+				Hacks();
 				if (Form1.Attached)
 				{
 					namePlateCheckBox.Checked = Settings.Default.DefaultRangeBool;
 					fovCheckBox.Checked = Settings.Default.DefaultFOVBool;
+					camDistCheckBox.Checked = Settings.Default.DefaultCamDistBool;
+					freezeCheckBox.Checked = Settings.Default.DefaultFreezeCamBool;
 					if (namePlateCheckBox.Checked)
                     {
 						Form1.Sharp.Write<float>(Form1.RangeAddy, (float)Settings.Default.DefaultRange, false);
@@ -262,11 +252,91 @@ namespace VanillaSSinn3r
 						fovTextBox.Text = (float)Form1.Sharp.Read<float>(Form1.FOVAddy, false) + "";
 						infoPrint("fov", float.Parse(fovTextBox.Text));
 					}
+					if (camDistCheckBox.Checked)
+					{
+                        Form1.Sharp.Write<float>(Form1.CamDistAddy[0], (float)Settings.Default.DefaultCamDist, false);
+						Form1.Sharp.Write<float>(Form1.CamDistAddy[1], (float)Settings.Default.DefaultCamDist, false);
+						camDistSlider.Value = (int)Form1.Sharp.Read<float>(Form1.CamDistAddy[0], false);
+						infoPrint("camera", camDistSlider.Value);
+					}
+					//the methods that will be executed by the main thread is "retrieveData"
+					delegateRetrieveData = new ThreadStart(cameraDistHack);
+					mainThread = new Thread(delegateRetrieveData);
+					mainThread.IsBackground = true;
+
+					//start the main thread
+					mainThread.Start();
 				}
 			}
 			catch (Exception ex)
 			{
-				Print(ex.Message);
+				if (debugCheckBox.Checked)
+					Print(ex.Message);
+			}
+		}
+
+		private void Hacks()
+        {
+			try
+            {
+				if (Form1.Version.Contains("5875")) // Vanilla
+				{
+					Form1.RangeAddy = new IntPtr(12900744); // 0xC4D988
+					Form1.FOVAddy = new IntPtr(8423860); // 0x8089B4
+					tmpPtr = getAddress(0xB4B2BC, new List<int> { 0x65B8, 0x198 });
+					if (tmpPtr != IntPtr.Zero)
+						Form1.CamDistAddy[0] = tmpPtr;
+					tmpPtr = getAddress(0xB4B2BC, new List<int> { 0x65B8, 0xEC });
+					if (tmpPtr != IntPtr.Zero)
+						Form1.CamDistAddy[1] = tmpPtr;
+
+					if (!versionChecked)
+					{
+						Print("World of Warcraft [" + Form1.Version + "] detected!");
+						GameDefaultNameplateRange = (float)Form1.Sharp.Read<float>(Form1.RangeAddy, false);
+						GameDefaultFOV = (float)Form1.Sharp.Read<float>(Form1.FOVAddy, false);
+						GameDefaultCameraDistanceLimit = (float)Form1.Sharp.Read<float>(Form1.CamDistAddy[0], false);
+						GameDefaultCameraDistance = (float)Form1.Sharp.Read<float>(Form1.CamDistAddy[1], false);
+						versionChecked = true;
+					}
+				}
+				else if (Form1.Version.Contains("8606")) // TBC
+				{
+					Form1.RangeAddy = new IntPtr(12209040); // 0xBA4B90
+					Form1.FOVAddy = new IntPtr(9132548); // 0x8b5a04
+					if (!versionChecked)
+                    {
+						Print("World of Warcraft [" + Form1.Version + "] detected!");
+						GameDefaultNameplateRange = (float)Form1.Sharp.Read<float>(Form1.RangeAddy, false);
+						GameDefaultFOV = (float)Form1.Sharp.Read<float>(Form1.FOVAddy, false);
+						versionChecked = true;
+					}						
+				}
+				else if (Form1.Version.Contains("12340")) // Wotlk
+				{
+					Form1.RangeAddy = new IntPtr(11381372); // 0xADAA7C
+					Form1.FOVAddy = new IntPtr(10390920); // 0x9e8d88
+					if (!versionChecked)
+                    {
+						Print("World of Warcraft [" + Form1.Version + "] detected!");
+						GameDefaultNameplateRange = (float)Form1.Sharp.Read<float>(Form1.RangeAddy, false);
+						GameDefaultFOV = (float)Form1.Sharp.Read<float>(Form1.FOVAddy, false);
+						versionChecked = true;
+					}						
+				}
+				else
+				{
+					Print("World of Warcraft [" + Form1.Version + "] is not supported.");
+					Form1.Sharp.Handle.Close();
+					Form1.Sharp.Dispose();
+					Form1.Attached = false;
+					Print("Detached from WoW [" + Form1.SelectedProcess + "]");
+				}
+			}
+			catch (Exception ex)
+			{
+				if(debugCheckBox.Checked)
+					Print(ex.Message);
 			}
 		}
 
@@ -324,15 +394,31 @@ namespace VanillaSSinn3r
 			save_n_reset();
 			infoPrint("nameplate", GameDefaultNameplateRange);
 			infoPrint("fov", GameDefaultFOV);
-			Form1.Attached = false;
+			infoPrint("camera", GameDefaultCameraDistanceLimit);
 			Print("==================== Detached ====================");
 		}
 
 		private void save_n_reset()
 		{
+			Hacks();
+			Form1.Attached = false;
+			versionChecked = false;
+			if (freezeCheckBox.Checked)
+            {
+				freezeCheckBox.Checked = false;
+				try
+				{
+					if (mainThread.IsAlive)
+						mainThread.Abort();
+				}
+				catch { }
+				freezeCheckBox.Checked = true;
+			}
 			saveSettings();
 			Form1.Sharp.Write<float>(Form1.RangeAddy, GameDefaultNameplateRange, false);
 			Form1.Sharp.Write<float>(Form1.FOVAddy, GameDefaultFOV, false);
+            Form1.Sharp.Write<float>(Form1.CamDistAddy[0], GameDefaultCameraDistanceLimit, false);
+			Form1.Sharp.Write<float>(Form1.CamDistAddy[1], GameDefaultCameraDistance, false);
 		}
 
 		private void saveSettings()
@@ -341,16 +427,131 @@ namespace VanillaSSinn3r
 				Settings.Default.DefaultRange = (int)namePlateRangeSlider.Value;
 			if (fovCheckBox.Checked)
 				Settings.Default.DefaultFOV = float.Parse(fovTextBox.Text);
+			if (camDistCheckBox.Checked)
+				Settings.Default.DefaultCamDist = (int)camDistSlider.Value;
 			Settings.Default.DefaultRangeBool = namePlateCheckBox.Checked;
 			Settings.Default.DefaultFOVBool = fovCheckBox.Checked;
+			Settings.Default.DefaultCamDistBool = camDistCheckBox.Checked;
+			Settings.Default.DefaultFreezeCamBool = freezeCheckBox.Checked;
 			Settings.Default.Save();
 		}
-
-
 		private void saveBtn_Click(object sender, EventArgs e)
         {
 			saveSettings();
 			Print("================== Settings Saved ==================");
 		}
+
+		private IntPtr getAddress(int baseM, List<int> offsets)
+		{
+			try
+			{
+				IntPtr Base = (IntPtr)baseM;
+				foreach (int ptr in offsets)
+					Base = Form1.Sharp.Read<IntPtr>(Base, false) + ptr;
+
+				return Base;
+			}
+			catch (Exception ex)
+			{
+				if (debugCheckBox.Checked)
+					Print(ex.Message);
+				return IntPtr.Zero;
+			}
+		}
+
+		private void cameraDistHack()
+		{
+			try
+			{
+				while (true)
+				{
+					if (freezeCheckBox.Checked)
+					{
+						camDistSlider.Enabled = false;
+						camDistHackCode();
+
+
+					}
+					else
+					{
+						camDistHackCode();
+						camDistSlider.Enabled = true;
+						break;
+					}
+				}
+			}
+			catch { }				
+		}
+
+		private void camDistHackCode()
+        {
+			if (!Form1.Attached || !camDistCheckBox.Checked)
+			{
+				return;
+			}
+			Hacks();
+			Form1.Sharp.Write<float>(CamDistAddy[0], (float)camDistSlider.Value, false);
+			Form1.Sharp.Write<float>(CamDistAddy[1], (float)camDistSlider.Value, false);
+			if (!Form1.AppClosing)
+			{
+				Settings.Default.DefaultCamDist = camDistSlider.Value;
+			}
+			Settings.Default.Save();
+		}
+
+		private void camDistSlider_Scroll(object sender, EventArgs e)
+        {
+			if (!Form1.Attached || !camDistCheckBox.Checked)
+			{
+				return;
+			}
+			cameraDistHack();
+			infoPrint("camera", camDistSlider.Value);
+		}
+
+        private void camDistCheckBox_CheckedChanged(object sender, EventArgs e)
+        {
+			Settings.Default.DefaultCamDistBool = camDistCheckBox.Checked;
+			Settings.Default.Save();
+			camDistSlider.Value = Settings.Default.DefaultCamDist;
+		}
+
+        private void freezeCheckBox_CheckedChanged(object sender, EventArgs e)
+        {
+			Settings.Default.DefaultFreezeCamBool = freezeCheckBox.Checked;
+			Settings.Default.Save();
+			if (!Form1.Attached)
+				return;
+			if (freezeCheckBox.Checked)
+			{ 
+				camDistSlider.Enabled = false;
+				try
+				{
+					if (!mainThread.IsAlive)
+					{
+						delegateRetrieveData = new ThreadStart(cameraDistHack);
+						mainThread = new Thread(delegateRetrieveData);
+						mainThread.IsBackground = true;
+						mainThread.Start();
+					}
+				}
+				catch { }
+			}
+			else if (!freezeCheckBox.Checked)
+            {
+				camDistSlider.Enabled = true;
+				try
+				{
+					if (mainThread.IsAlive)
+						mainThread.Abort();
+				}
+				catch { }
+			}
+		}
+
+        private void infoBox_TextChanged(object sender, EventArgs e)
+        {}
+        private void debugCheckBox_CheckedChanged(object sender, EventArgs e)
+        {}
     }
 }
