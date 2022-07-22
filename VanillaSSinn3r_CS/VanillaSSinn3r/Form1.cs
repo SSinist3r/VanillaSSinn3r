@@ -41,6 +41,8 @@ namespace VanillaSSinn3r
 
 		public static bool versionChecked = false;
 
+		public static string warningText = "=== Need to Enter in the World First Then Use This Tool ===";
+
 		public static IntPtr tmpPtr;
 
 		ThreadStart delegateRetrieveData;
@@ -59,6 +61,7 @@ namespace VanillaSSinn3r
 			FormClosing += new FormClosingEventHandler(Form1_FormClosing);
 			ProcessWatcherInit();
 			Init();
+			Print(warningText);
 		}
 
 		private void Form1_FormClosing(object sender, FormClosingEventArgs e)
@@ -254,10 +257,19 @@ namespace VanillaSSinn3r
 					}
 					if (camDistCheckBox.Checked)
 					{
-                        Form1.Sharp.Write<float>(Form1.CamDistAddy[0], (float)Settings.Default.DefaultCamDist, false);
-						Form1.Sharp.Write<float>(Form1.CamDistAddy[1], (float)Settings.Default.DefaultCamDist, false);
-						camDistSlider.Value = (int)Form1.Sharp.Read<float>(Form1.CamDistAddy[0], false);
-						infoPrint("camera", camDistSlider.Value);
+						try
+						{
+							Form1.Sharp.Write<float>(Form1.CamDistAddy[0], (float)Settings.Default.DefaultCamDist, false);
+							Form1.Sharp.Write<float>(Form1.CamDistAddy[1], (float)Settings.Default.DefaultCamDist, false);
+							camDistSlider.Value = (int)Form1.Sharp.Read<float>(Form1.CamDistAddy[0], false);
+							infoPrint("camera", camDistSlider.Value);
+						}
+						catch
+						{ 
+							Print(warningText);
+							Clipboard.SetText(warningText);
+							Application.Exit(); 
+						}
 					}
 					//the methods that will be executed by the main thread is "retrieveData"
 					delegateRetrieveData = new ThreadStart(cameraDistHack);
@@ -304,11 +316,19 @@ namespace VanillaSSinn3r
 				{
 					Form1.RangeAddy = new IntPtr(12209040); // 0xBA4B90
 					Form1.FOVAddy = new IntPtr(9132548); // 0x8b5a04
+					tmpPtr = getAddress(0xC6ECCC, new List<int> { 0x732C, 0x1B4 });
+					if (tmpPtr != IntPtr.Zero)
+						Form1.CamDistAddy[0] = tmpPtr;
+					tmpPtr = getAddress(0xC6ECCC, new List<int> { 0x732C, 0x100 });
+					if (tmpPtr != IntPtr.Zero)
+						Form1.CamDistAddy[1] = tmpPtr;
 					if (!versionChecked)
                     {
 						Print("World of Warcraft [" + Form1.Version + "] detected!");
 						GameDefaultNameplateRange = (float)Form1.Sharp.Read<float>(Form1.RangeAddy, false);
 						GameDefaultFOV = (float)Form1.Sharp.Read<float>(Form1.FOVAddy, false);
+						GameDefaultCameraDistanceLimit = (float)Form1.Sharp.Read<float>(Form1.CamDistAddy[0], false);
+						GameDefaultCameraDistance = (float)Form1.Sharp.Read<float>(Form1.CamDistAddy[1], false);
 						versionChecked = true;
 					}						
 				}
@@ -316,11 +336,19 @@ namespace VanillaSSinn3r
 				{
 					Form1.RangeAddy = new IntPtr(11381372); // 0xADAA7C
 					Form1.FOVAddy = new IntPtr(10390920); // 0x9e8d88
+					tmpPtr = getAddress(0xB7436C, new List<int> { 0x7E20, 0x1E8 });
+					if (tmpPtr != IntPtr.Zero)
+						Form1.CamDistAddy[0] = tmpPtr;
+					tmpPtr = getAddress(0xB7436C, new List<int> { 0x7E20, 0x118 });
+					if (tmpPtr != IntPtr.Zero)
+						Form1.CamDistAddy[1] = tmpPtr;
 					if (!versionChecked)
                     {
 						Print("World of Warcraft [" + Form1.Version + "] detected!");
 						GameDefaultNameplateRange = (float)Form1.Sharp.Read<float>(Form1.RangeAddy, false);
 						GameDefaultFOV = (float)Form1.Sharp.Read<float>(Form1.FOVAddy, false);
+						GameDefaultCameraDistanceLimit = (float)Form1.Sharp.Read<float>(Form1.CamDistAddy[0], false);
+						GameDefaultCameraDistance = (float)Form1.Sharp.Read<float>(Form1.CamDistAddy[1], false);
 						versionChecked = true;
 					}						
 				}
