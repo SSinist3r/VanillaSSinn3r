@@ -296,6 +296,7 @@ namespace VanillaSSinn3r
 				}
 			}
 			Settings.Default.Save();
+			Clipboard.SetText("/console ReloadUI");
 		}
 
         private void namePlateCheckBox_CheckedChanged(object sender, EventArgs e)
@@ -329,6 +330,13 @@ namespace VanillaSSinn3r
 
 		private void save_n_reset()
 		{
+			saveSettings();
+			Form1.Sharp.Write<float>(Form1.RangeAddy, GameDefaultNameplateRange, false);
+			Form1.Sharp.Write<float>(Form1.FOVAddy, GameDefaultFOV, false);
+		}
+
+		private void saveSettings()
+		{
 			if (namePlateCheckBox.Checked)
 				Settings.Default.DefaultRange = (int)namePlateRangeSlider.Value;
 			if (fovCheckBox.Checked)
@@ -336,9 +344,13 @@ namespace VanillaSSinn3r
 			Settings.Default.DefaultRangeBool = namePlateCheckBox.Checked;
 			Settings.Default.DefaultFOVBool = fovCheckBox.Checked;
 			Settings.Default.Save();
-			Form1.Sharp.Write<float>(Form1.RangeAddy, GameDefaultNameplateRange, false);
-			Form1.Sharp.Write<float>(Form1.FOVAddy, GameDefaultFOV, false);
 		}
 
-	}
+
+		private void saveBtn_Click(object sender, EventArgs e)
+        {
+			saveSettings();
+			Print("================== Settings Saved ==================");
+		}
+    }
 }

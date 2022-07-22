@@ -42,6 +42,7 @@ namespace VanillaSSinn3r
             this.namePlateCheckBox = new System.Windows.Forms.CheckBox();
             this.fovCheckBox = new System.Windows.Forms.CheckBox();
             this.resetBtn = new System.Windows.Forms.Button();
+            this.saveBtn = new System.Windows.Forms.Button();
             ((System.ComponentModel.ISupportInitialize)(this.namePlateRangeSlider)).BeginInit();
             this.SuspendLayout();
             // 
@@ -78,11 +79,11 @@ namespace VanillaSSinn3r
             // attachBtn
             // 
             this.attachBtn.AutoSize = true;
-            this.attachBtn.Location = new System.Drawing.Point(12, 212);
+            this.attachBtn.Location = new System.Drawing.Point(94, 212);
             this.attachBtn.Name = "attachBtn";
-            this.attachBtn.Size = new System.Drawing.Size(303, 30);
+            this.attachBtn.Size = new System.Drawing.Size(221, 30);
             this.attachBtn.TabIndex = 3;
-            this.attachBtn.Text = "      Attach";
+            this.attachBtn.Text = "    Attach";
             this.attachBtn.UseVisualStyleBackColor = true;
             this.attachBtn.Click += new System.EventHandler(this.attachBtn_Click);
             // 
@@ -155,7 +156,7 @@ namespace VanillaSSinn3r
             // resetBtn
             // 
             this.resetBtn.AutoSize = true;
-            this.resetBtn.Location = new System.Drawing.Point(321, 212);
+            this.resetBtn.Location = new System.Drawing.Point(12, 212);
             this.resetBtn.Name = "resetBtn";
             this.resetBtn.Size = new System.Drawing.Size(76, 30);
             this.resetBtn.TabIndex = 28;
@@ -163,11 +164,23 @@ namespace VanillaSSinn3r
             this.resetBtn.UseVisualStyleBackColor = true;
             this.resetBtn.Click += new System.EventHandler(this.resetBtn_Click);
             // 
+            // saveBtn
+            // 
+            this.saveBtn.AutoSize = true;
+            this.saveBtn.Location = new System.Drawing.Point(321, 212);
+            this.saveBtn.Name = "saveBtn";
+            this.saveBtn.Size = new System.Drawing.Size(76, 30);
+            this.saveBtn.TabIndex = 29;
+            this.saveBtn.Text = "Save";
+            this.saveBtn.UseVisualStyleBackColor = true;
+            this.saveBtn.Click += new System.EventHandler(this.saveBtn_Click);
+            // 
             // Form1
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-            this.ClientSize = new System.Drawing.Size(412, 334);
+            this.ClientSize = new System.Drawing.Size(412, 332);
+            this.Controls.Add(this.saveBtn);
             this.Controls.Add(this.resetBtn);
             this.Controls.Add(this.fovCheckBox);
             this.Controls.Add(this.namePlateCheckBox);
@@ -201,6 +214,7 @@ namespace VanillaSSinn3r
         private System.Windows.Forms.CheckBox namePlateCheckBox;
         private System.Windows.Forms.CheckBox fovCheckBox;
         private System.Windows.Forms.Button resetBtn;
+        private System.Windows.Forms.Button saveBtn;
     }
 }
 
