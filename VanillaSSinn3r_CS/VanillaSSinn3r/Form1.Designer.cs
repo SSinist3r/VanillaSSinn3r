@@ -244,7 +244,9 @@ namespace VanillaSSinn3r
             this.Controls.Add(this.refreshBtn);
             this.Controls.Add(this.processBox);
             this.Controls.Add(this.namePlateRangeSlider);
+            this.FormBorderStyle = System.Windows.Forms.FormBorderStyle.FixedSingle;
             this.Icon = ((System.Drawing.Icon)(resources.GetObject("$this.Icon")));
+            this.MaximizeBox = false;
             this.Name = "Form1";
             this.Text = "Form1";
             ((System.ComponentModel.ISupportInitialize)(this.namePlateRangeSlider)).EndInit();
