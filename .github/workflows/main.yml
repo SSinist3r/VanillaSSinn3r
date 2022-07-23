@@ -42,4 +42,4 @@ jobs:
         uses: actions/upload-artifact@v3.1.0
         with:
           name: Published VanillaSSinn3r
-          path: bin\x86\Release
+          path: bin/x86/Release/*
