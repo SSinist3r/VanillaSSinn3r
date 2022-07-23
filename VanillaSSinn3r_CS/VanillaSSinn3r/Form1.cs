@@ -49,6 +49,8 @@ namespace VanillaSSinn3r
 
 		public static byte[] namePlateAddSwitchTo = { 216, 29, 216, 254, 128, 0, 221, 216 };
 
+		public static bool isVanilla = false;
+
 		ThreadStart delegateRetrieveData;
 
 		Thread mainThread;
@@ -304,7 +306,11 @@ namespace VanillaSSinn3r
 				if (Form1.Version.Contains("5875")) // Vanilla
 				{
 					//printBytes(Form1.Sharp.Read<byte>((IntPtr)(0x60F7B8), 8, false));
-					Form1.Sharp.Write<byte>((IntPtr)(0x60F7B8), namePlateAddSwitchTo, false); // Switching Nameplate Render Address To FarClip Evaluator From Nameplate Evaluator
+					if (!isVanilla)
+                    {
+						Form1.Sharp.Write<byte>((IntPtr)(0x60F7B8), namePlateAddSwitchTo, false); // Switching Nameplate Render Address To FarClip Evaluator From Nameplate Evaluator
+						isVanilla = true;
+					}
 					// Form1.RangeAddy = new IntPtr(12900744); // 0xC4D988 // Detected in vMaNGOS
 					Form1.RangeAddy = new IntPtr(8453848); // 0x80FED8 Now using farclip address for manipulating nameplate range
 					Form1.FOVAddy = new IntPtr(8423860); // 0x8089B4
@@ -483,7 +489,11 @@ namespace VanillaSSinn3r
 				freezeCheckBox.Checked = true;
 			}
 			saveSettings();
-			Form1.Sharp.Write<byte>((IntPtr)(0x60F7B8), namePlateAddSwitchFrom, false); // Switching Back Nameplate Render Address To Nameplate Evaluator From FarClip Evaluator
+			if(isVanilla)
+            {
+				Form1.Sharp.Write<byte>((IntPtr)(0x60F7B8), namePlateAddSwitchFrom, false); // Switching Back Nameplate Render Address To Nameplate Evaluator From FarClip Evaluator
+				isVanilla = false;
+			}
 			Form1.Sharp.Write<float>(Form1.RangeAddy, GameDefaultNameplateRange, false);
 			Form1.Sharp.Write<float>(Form1.FOVAddy, GameDefaultFOV, false);
 			if (tmpPtr != IntPtr.Zero)

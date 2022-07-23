@@ -89,5 +89,51 @@ namespace VanillaSSinn3r.Properties
                 this["DefaultFOVBool"] = value;
             }
         }
+
+        [DefaultSettingValue("false")]
+        [UserScopedSetting]
+        [DebuggerNonUserCode]
+        public bool DefaultCamDistBool
+        {
+            get
+            {
+                return (bool)this["DefaultCamDistBool"];
+            }
+            set
+            {
+                this["DefaultCamDistBool"] = value;
+            }
+        }
+
+        [DefaultSettingValue("false")]
+        [UserScopedSetting]
+        [DebuggerNonUserCode]
+        public bool DefaultFreezeCamBool
+        {
+            get
+            {
+                return (bool)this["DefaultFreezeCamBool"];
+            }
+            set
+            {
+                this["DefaultFreezeCamBool"] = value;
+            }
+        }
+
+        [DefaultSettingValue("50")]
+        [UserScopedSetting]
+        [DebuggerNonUserCode]
+        public int DefaultCamDist
+        {
+            get
+            {
+                return (int)this["DefaultCamDist"];
+            }
+            set
+            {
+                this["DefaultCamDist"] = value;
+            }
+        }
+
     }
 }
