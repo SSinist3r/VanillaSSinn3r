@@ -259,10 +259,13 @@ namespace VanillaSSinn3r
 					{
 						try
 						{
-							Form1.Sharp.Write<float>(Form1.CamDistAddy[0], (float)Settings.Default.DefaultCamDist, false);
-							Form1.Sharp.Write<float>(Form1.CamDistAddy[1], (float)Settings.Default.DefaultCamDist, false);
-							camDistSlider.Value = (int)Form1.Sharp.Read<float>(Form1.CamDistAddy[0], false);
-							infoPrint("camera", camDistSlider.Value);
+							if (tmpPtr != IntPtr.Zero)
+							{
+								Form1.Sharp.Write<float>(Form1.CamDistAddy[0], (float)Settings.Default.DefaultCamDist, false);
+								Form1.Sharp.Write<float>(Form1.CamDistAddy[1], (float)Settings.Default.DefaultCamDist, false);
+								camDistSlider.Value = (int)Form1.Sharp.Read<float>(Form1.CamDistAddy[0], false);
+								infoPrint("camera", camDistSlider.Value);
+							}
 						}
 						catch
 						{ 
@@ -283,7 +286,10 @@ namespace VanillaSSinn3r
 			catch (Exception ex)
 			{
 				if (debugCheckBox.Checked)
+                {
 					Print(ex.Message);
+					Print("Debug: Inside attachBtn Catch");
+				}
 			}
 		}
 
@@ -301,14 +307,21 @@ namespace VanillaSSinn3r
 					tmpPtr = getAddress(0xB4B2BC, new List<int> { 0x65B8, 0xEC });
 					if (tmpPtr != IntPtr.Zero)
 						Form1.CamDistAddy[1] = tmpPtr;
-
 					if (!versionChecked)
 					{
 						Print("World of Warcraft [" + Form1.Version + "] detected!");
 						GameDefaultNameplateRange = (float)Form1.Sharp.Read<float>(Form1.RangeAddy, false);
 						GameDefaultFOV = (float)Form1.Sharp.Read<float>(Form1.FOVAddy, false);
-						GameDefaultCameraDistanceLimit = (float)Form1.Sharp.Read<float>(Form1.CamDistAddy[0], false);
-						GameDefaultCameraDistance = (float)Form1.Sharp.Read<float>(Form1.CamDistAddy[1], false);
+						if (tmpPtr != IntPtr.Zero)
+						{
+							GameDefaultCameraDistanceLimit = (float)Form1.Sharp.Read<float>(Form1.CamDistAddy[0], false);
+							GameDefaultCameraDistance = (float)Form1.Sharp.Read<float>(Form1.CamDistAddy[1], false);
+						}
+						else
+                        {
+							GameDefaultCameraDistanceLimit = (float) 50;
+							GameDefaultCameraDistance = (float) 50;
+						}
 						versionChecked = true;
 					}
 				}
@@ -327,8 +340,16 @@ namespace VanillaSSinn3r
 						Print("World of Warcraft [" + Form1.Version + "] detected!");
 						GameDefaultNameplateRange = (float)Form1.Sharp.Read<float>(Form1.RangeAddy, false);
 						GameDefaultFOV = (float)Form1.Sharp.Read<float>(Form1.FOVAddy, false);
-						GameDefaultCameraDistanceLimit = (float)Form1.Sharp.Read<float>(Form1.CamDistAddy[0], false);
-						GameDefaultCameraDistance = (float)Form1.Sharp.Read<float>(Form1.CamDistAddy[1], false);
+						if (tmpPtr != IntPtr.Zero)
+						{
+							GameDefaultCameraDistanceLimit = (float)Form1.Sharp.Read<float>(Form1.CamDistAddy[0], false);
+							GameDefaultCameraDistance = (float)Form1.Sharp.Read<float>(Form1.CamDistAddy[1], false);
+						}
+						else
+						{
+							GameDefaultCameraDistanceLimit = (float) 50;
+							GameDefaultCameraDistance = (float) 50;
+						}
 						versionChecked = true;
 					}						
 				}
@@ -347,8 +368,16 @@ namespace VanillaSSinn3r
 						Print("World of Warcraft [" + Form1.Version + "] detected!");
 						GameDefaultNameplateRange = (float)Form1.Sharp.Read<float>(Form1.RangeAddy, false);
 						GameDefaultFOV = (float)Form1.Sharp.Read<float>(Form1.FOVAddy, false);
-						GameDefaultCameraDistanceLimit = (float)Form1.Sharp.Read<float>(Form1.CamDistAddy[0], false);
-						GameDefaultCameraDistance = (float)Form1.Sharp.Read<float>(Form1.CamDistAddy[1], false);
+						if (tmpPtr != IntPtr.Zero)
+                        {
+							GameDefaultCameraDistanceLimit = (float)Form1.Sharp.Read<float>(Form1.CamDistAddy[0], false);
+							GameDefaultCameraDistance = (float)Form1.Sharp.Read<float>(Form1.CamDistAddy[1], false);
+						}
+						else
+						{
+							GameDefaultCameraDistanceLimit = (float) 30;
+							GameDefaultCameraDistance = (float) 30;
+						}
 						versionChecked = true;
 					}						
 				}
@@ -363,8 +392,11 @@ namespace VanillaSSinn3r
 			}
 			catch (Exception ex)
 			{
-				if(debugCheckBox.Checked)
+				if (debugCheckBox.Checked)
+				{
 					Print(ex.Message);
+					Print("Debug: Inside H() Catch");
+				}
 			}
 		}
 
@@ -422,7 +454,8 @@ namespace VanillaSSinn3r
 			save_n_reset();
 			infoPrint("nameplate", (float)Math.Sqrt(GameDefaultNameplateRange));
 			infoPrint("fov", GameDefaultFOV);
-			infoPrint("camera", GameDefaultCameraDistanceLimit);
+			if (tmpPtr != IntPtr.Zero)
+				infoPrint("camera", GameDefaultCameraDistanceLimit);
 			Print("==================== Detached ====================");
 		}
 
@@ -445,8 +478,11 @@ namespace VanillaSSinn3r
 			saveSettings();
 			Form1.Sharp.Write<float>(Form1.RangeAddy, GameDefaultNameplateRange, false);
 			Form1.Sharp.Write<float>(Form1.FOVAddy, GameDefaultFOV, false);
-            Form1.Sharp.Write<float>(Form1.CamDistAddy[0], GameDefaultCameraDistanceLimit, false);
-			Form1.Sharp.Write<float>(Form1.CamDistAddy[1], GameDefaultCameraDistance, false);
+			if (tmpPtr != IntPtr.Zero)
+            {
+				Form1.Sharp.Write<float>(Form1.CamDistAddy[0], GameDefaultCameraDistanceLimit, false);
+				Form1.Sharp.Write<float>(Form1.CamDistAddy[1], GameDefaultCameraDistance, false);
+			}
 		}
 
 		private void saveSettings()
@@ -482,7 +518,10 @@ namespace VanillaSSinn3r
 			catch (Exception ex)
 			{
 				if (debugCheckBox.Checked)
+				{ 
 					Print(ex.Message);
+					Print("Debug: Inside getAddress Catch");
+				}
 				return IntPtr.Zero;
 			}
 		}
@@ -518,8 +557,11 @@ namespace VanillaSSinn3r
 				return;
 			}
 			Hacks();
-			Form1.Sharp.Write<float>(CamDistAddy[0], (float)camDistSlider.Value, false);
-			Form1.Sharp.Write<float>(CamDistAddy[1], (float)camDistSlider.Value, false);
+			if (tmpPtr != IntPtr.Zero)
+            {
+				Form1.Sharp.Write<float>(CamDistAddy[0], (float)camDistSlider.Value, false);
+				Form1.Sharp.Write<float>(CamDistAddy[1], (float)camDistSlider.Value, false);
+			}
 			if (!Form1.AppClosing)
 			{
 				Settings.Default.DefaultCamDist = camDistSlider.Value;
