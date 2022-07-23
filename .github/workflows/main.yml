@@ -33,10 +33,10 @@ jobs:
         uses: NuGet/setup-nuget@v1.0.6
       
       - name: Restore NuGet Packages
-        run: nuget restore VanillaSSinn3r.sln
+        run: nuget restore VanillaSSinn3r_CS/VanillaSSinn3r.sln
       
       - name: Build and Publish App
-        run: msbuild VanillaSSinn3r.sln /p:Configuration=Release /p:Platform=x86 /p:DeployOnBuild=true
+        run: msbuild VanillaSSinn3r_CS/VanillaSSinn3r.sln /p:Configuration=Release /p:Platform=x86 /p:DeployOnBuild=true
         
       - name: Upload Artifact
         uses: actions/upload-artifact@v3.1.0
