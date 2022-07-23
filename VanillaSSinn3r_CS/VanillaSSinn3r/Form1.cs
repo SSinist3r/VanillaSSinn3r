@@ -185,7 +185,7 @@ namespace VanillaSSinn3r
 		public void infoPrint(string forText, float value)
 		{
 			if(forText.Contains("nameplate"))
-				Print("Nameplate Range: " + (Math.Sqrt(value)).ToString("F") + " yards");
+				Print("Nameplate Range: " + (value).ToString("F") + " yards");
 			else if (forText.Contains("fov"))
 				Print("FOV: " + value + "	(Use In Game: \' /console ReloadUI \')");
 			else if (forText.Contains("camera"))
@@ -199,7 +199,7 @@ namespace VanillaSSinn3r
 			{
 				return;
 			}
-			Form1.Sharp.Write<float>(Form1.RangeAddy, (float)namePlateRangeSlider.Value, false);
+			Form1.Sharp.Write<float>(Form1.RangeAddy, (float)(Math.Pow(namePlateRangeSlider.Value, 2)), false);
 			if (!Form1.AppClosing)
 			{
 				Settings.Default.DefaultRange = namePlateRangeSlider.Value;
@@ -244,8 +244,8 @@ namespace VanillaSSinn3r
 					freezeCheckBox.Checked = Settings.Default.DefaultFreezeCamBool;
 					if (namePlateCheckBox.Checked)
                     {
-						Form1.Sharp.Write<float>(Form1.RangeAddy, (float)Settings.Default.DefaultRange, false);
-						namePlateRangeSlider.Value = (int)Form1.Sharp.Read<float>(Form1.RangeAddy, false);
+						Form1.Sharp.Write<float>(Form1.RangeAddy, (float)(Math.Pow(Settings.Default.DefaultRange, 2)), false);
+						namePlateRangeSlider.Value = (int)(Math.Sqrt(Form1.Sharp.Read<float>(Form1.RangeAddy, false)));
 						infoPrint("nameplate", namePlateRangeSlider.Value);
 
 					}
@@ -420,7 +420,7 @@ namespace VanillaSSinn3r
 			infoBox.Text = "";
 			Print("======= Resetting Values To Game Default/Original =======");
 			save_n_reset();
-			infoPrint("nameplate", GameDefaultNameplateRange);
+			infoPrint("nameplate", (float)Math.Sqrt(GameDefaultNameplateRange));
 			infoPrint("fov", GameDefaultFOV);
 			infoPrint("camera", GameDefaultCameraDistanceLimit);
 			Print("==================== Detached ====================");

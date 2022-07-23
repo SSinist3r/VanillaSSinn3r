@@ -54,7 +54,7 @@ namespace VanillaSSinn3r
             // namePlateRangeSlider
             // 
             this.namePlateRangeSlider.Location = new System.Drawing.Point(137, 273);
-            this.namePlateRangeSlider.Maximum = 250000;
+            this.namePlateRangeSlider.Maximum = 1000;
             this.namePlateRangeSlider.Name = "namePlateRangeSlider";
             this.namePlateRangeSlider.Size = new System.Drawing.Size(260, 45);
             this.namePlateRangeSlider.TabIndex = 0;
