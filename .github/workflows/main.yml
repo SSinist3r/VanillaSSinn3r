@@ -36,10 +36,10 @@ jobs:
         run: nuget restore VanillaSSinn3r_CS/VanillaSSinn3r.sln
       
       - name: Build and Publish App
-        run: msbuild VanillaSSinn3r_CS/VanillaSSinn3r.sln /p:Configuration=Release /p:Platform=x86 /p:DeployOnBuild=true /p:PublishProfile=local
+        run: msbuild VanillaSSinn3r_CS/VanillaSSinn3r.sln /p:Configuration=Release /p:Platform=x86 /p:DeployOnBuild=true
         
       - name: Upload Artifact
         uses: actions/upload-artifact@v3.1.0
         with:
           name: Published VanillaSSinn3r
-          path: VanillaSSinn3r_CS/bin/x86/Release/*
+          path: VanillaSSinn3r_CS/VanillaSSinn3r/bin/x86/Release/*
