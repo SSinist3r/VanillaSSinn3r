@@ -7,8 +7,9 @@ on:
   # Triggers the workflow on push or pull request events but only for the "master" branch
   push:
     branches: [ "master" ]
-  pull_request:
-    branches: [ "master" ]
+  schedule:
+  # * is a special character in YAML so you have to quote this string
+  - cron:  '0 0 * * 0'
 
   # Allows you to run this workflow manually from the Actions tab
   workflow_dispatch:
@@ -42,4 +43,5 @@ jobs:
         uses: actions/upload-artifact@v3.1.0
         with:
           name: Published VanillaSSinn3r
-          path: VanillaSSinn3r_CS/VanillaSSinn3r/bin/x86/Release/*
+          path: VanillaSSinn3r_CS/VanillaSSinn3r/bin/x86/Release/VanillaSSinn3r.exe
+          retention-days: 30
