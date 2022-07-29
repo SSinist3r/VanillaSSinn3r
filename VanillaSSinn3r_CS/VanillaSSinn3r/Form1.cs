@@ -25,7 +25,9 @@ namespace VanillaSSinn3r
 
 		public static IntPtr FOVAddy;
 
-		public static IntPtr[] CamDistAddy = new IntPtr[2];
+		public static IntPtr[] CamDistAddy = new IntPtr[2]; // 1: Camera Distance Limit, 2: Camera Distance
+
+		public static IntPtr[] maxCamDistance = new IntPtr[2]; // 1: Max Camera Distance, 2: MaxCameraDistance Variable (/console CameraDistanceMax N)
 
 		public static int SelectedProcess;
 
@@ -178,6 +180,7 @@ namespace VanillaSSinn3r
 			Form1.Sharp.Handle.Close();
 			Form1.Sharp.Dispose();
 			Form1.Attached = false;
+			Form1.isVanilla = false;
 		}
 
 		public void Print(string msg)
@@ -265,8 +268,10 @@ namespace VanillaSSinn3r
 					{
 						try
 						{
+							Form1.Sharp.Write<float>(Form1.maxCamDistance[0], (float)Settings.Default.DefaultCamDist, false);
 							if (tmpPtr != IntPtr.Zero)
 							{
+								Form1.Sharp.Write<float>(Form1.maxCamDistance[1], (float)Settings.Default.DefaultCamDist, false);
 								Form1.Sharp.Write<float>(Form1.CamDistAddy[0], (float)Settings.Default.DefaultCamDist, false);
 								Form1.Sharp.Write<float>(Form1.CamDistAddy[1], (float)Settings.Default.DefaultCamDist, false);
 								camDistSlider.Value = (int)Form1.Sharp.Read<float>(Form1.CamDistAddy[0], false);
@@ -314,6 +319,12 @@ namespace VanillaSSinn3r
 					// Form1.RangeAddy = new IntPtr(12900744); // 0xC4D988 // Detected in vMaNGOS
 					Form1.RangeAddy = new IntPtr(8453848); // 0x80FED8 Now using farclip address for manipulating nameplate range
 					Form1.FOVAddy = new IntPtr(8423860); // 0x8089B4
+                    Form1.maxCamDistance[0] = new IntPtr(8423844); // 0x8089A4
+
+					tmpPtr = getAddress(0xBE0E6C, new List<int> { 0x24 });
+					if (tmpPtr != IntPtr.Zero)
+						Form1.maxCamDistance[1] = tmpPtr;
+
 					tmpPtr = getAddress(0xB4B2BC, new List<int> { 0x65B8, 0x198 });
 					if (tmpPtr != IntPtr.Zero)
 						Form1.CamDistAddy[0] = tmpPtr;
@@ -327,7 +338,7 @@ namespace VanillaSSinn3r
 						GameDefaultFOV = (float)Form1.Sharp.Read<float>(Form1.FOVAddy, false);
 						if (tmpPtr != IntPtr.Zero)
 						{
-							GameDefaultCameraDistanceLimit = (float)Form1.Sharp.Read<float>(Form1.CamDistAddy[0], false);
+							GameDefaultCameraDistanceLimit = (float)Form1.Sharp.Read<float>(Form1.maxCamDistance[0], false); // Before : (float)Form1.Sharp.Read<float>(Form1.CamDistAddy[0], false);
 							GameDefaultCameraDistance = (float)Form1.Sharp.Read<float>(Form1.CamDistAddy[1], false);
 						}
 						else
@@ -342,6 +353,12 @@ namespace VanillaSSinn3r
 				{
 					Form1.RangeAddy = new IntPtr(12209040); // 0xBA4B90
 					Form1.FOVAddy = new IntPtr(9132548); // 0x8b5a04
+					Form1.maxCamDistance[0] = new IntPtr(9132532); // 0x8B59F4
+
+					tmpPtr = getAddress(0xCF3204, new List<int> { 0x24 });
+					if (tmpPtr != IntPtr.Zero)
+						Form1.maxCamDistance[1] = tmpPtr;
+
 					tmpPtr = getAddress(0xC6ECCC, new List<int> { 0x732C, 0x1B4 });
 					if (tmpPtr != IntPtr.Zero)
 						Form1.CamDistAddy[0] = tmpPtr;
@@ -355,7 +372,7 @@ namespace VanillaSSinn3r
 						GameDefaultFOV = (float)Form1.Sharp.Read<float>(Form1.FOVAddy, false);
 						if (tmpPtr != IntPtr.Zero)
 						{
-							GameDefaultCameraDistanceLimit = (float)Form1.Sharp.Read<float>(Form1.CamDistAddy[0], false);
+							GameDefaultCameraDistanceLimit = (float)Form1.Sharp.Read<float>(Form1.maxCamDistance[0], false); // Before : (float)Form1.Sharp.Read<float>(Form1.CamDistAddy[0], false);
 							GameDefaultCameraDistance = (float)Form1.Sharp.Read<float>(Form1.CamDistAddy[1], false);
 						}
 						else
@@ -370,6 +387,12 @@ namespace VanillaSSinn3r
 				{
 					Form1.RangeAddy = new IntPtr(11381372); // 0xADAA7C
 					Form1.FOVAddy = new IntPtr(10390920); // 0x9e8d88
+					Form1.maxCamDistance[0] = new IntPtr(10609404); // 0xA1E2FC
+
+					tmpPtr = getAddress(0xC2498C, new List<int> { 0x2C });
+					if (tmpPtr != IntPtr.Zero)
+						Form1.maxCamDistance[1] = tmpPtr;
+
 					tmpPtr = getAddress(0xB7436C, new List<int> { 0x7E20, 0x1E8 });
 					if (tmpPtr != IntPtr.Zero)
 						Form1.CamDistAddy[0] = tmpPtr;
@@ -383,7 +406,7 @@ namespace VanillaSSinn3r
 						GameDefaultFOV = (float)Form1.Sharp.Read<float>(Form1.FOVAddy, false);
 						if (tmpPtr != IntPtr.Zero)
                         {
-							GameDefaultCameraDistanceLimit = (float)Form1.Sharp.Read<float>(Form1.CamDistAddy[0], false);
+							GameDefaultCameraDistanceLimit = (float)Form1.Sharp.Read<float>(Form1.maxCamDistance[0], false); // Before : (float)Form1.Sharp.Read<float>(Form1.CamDistAddy[0], false);
 							GameDefaultCameraDistance = (float)Form1.Sharp.Read<float>(Form1.CamDistAddy[1], false);
 						}
 						else
@@ -496,8 +519,10 @@ namespace VanillaSSinn3r
 			}
 			Form1.Sharp.Write<float>(Form1.RangeAddy, GameDefaultNameplateRange, false);
 			Form1.Sharp.Write<float>(Form1.FOVAddy, GameDefaultFOV, false);
+			Form1.Sharp.Write<float>(Form1.maxCamDistance[0], GameDefaultCameraDistanceLimit, false);
 			if (tmpPtr != IntPtr.Zero)
             {
+				Form1.Sharp.Write<float>(Form1.maxCamDistance[1], GameDefaultCameraDistanceLimit, false);
 				Form1.Sharp.Write<float>(Form1.CamDistAddy[0], GameDefaultCameraDistanceLimit, false);
 				Form1.Sharp.Write<float>(Form1.CamDistAddy[1], GameDefaultCameraDistance, false);
 			}
@@ -574,9 +599,11 @@ namespace VanillaSSinn3r
 			{
 				return;
 			}
+			Form1.Sharp.Write<float>(maxCamDistance[0], (float)camDistSlider.Value, false);
 			Hacks();
 			if (tmpPtr != IntPtr.Zero)
             {
+				Form1.Sharp.Write<float>(maxCamDistance[1], (float)camDistSlider.Value, false);
 				Form1.Sharp.Write<float>(CamDistAddy[0], (float)camDistSlider.Value, false);
 				Form1.Sharp.Write<float>(CamDistAddy[1], (float)camDistSlider.Value, false);
 			}
