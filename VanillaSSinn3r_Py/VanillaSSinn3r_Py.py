@@ -285,8 +285,10 @@ def bgSoundCheckBox_Clicked():
         with Process.open_process(pid) as p:
             if bgSoundCheckBoxVar.get():
                 p.write_memory(0x7A4869, ctypes.c_byte(39))
+                bgSoundCheckBox.config(bg="light green")
             else:
                 p.write_memory(0x7A4869, ctypes.c_byte(20))
+                bgSoundCheckBox.config(bg=defaultbg)
             p.close()
 
 def quicklootCheckBox_Clicked():
@@ -297,10 +299,12 @@ def quicklootCheckBox_Clicked():
             if quicklootCheckBoxVar.get():
                 p.write_memory(0x4C1ECF, ctypes.c_byte(117))
                 p.write_memory(0x4C2B25, ctypes.c_byte(117))
+                quicklootCheckBox.config(bg="light green")
             else:
                 p.write_memory(0x4C1ECF, ctypes.c_byte(116))
                 p.write_memory(0x4C2B25, ctypes.c_byte(116))
-            p.close()  
+                quicklootCheckBox.config(bg=defaultbg)
+            p.close()
 
 '''
 ======================================================== Functions for UI ========================================================
@@ -613,6 +617,7 @@ if __name__ == "__main__":
     master = tk.Tk()
     # master.iconphoto(True, tk.PhotoImage(file='logo.png'))
     # master.iconbitmap('logo.ico')
+    defaultbg = master.cget('bg')
     master.title('VanillaSSinn3r - WoW Vanilla/TBC/WotLK Tool By SSinist3r')
     master.geometry(ui_default_size)
     master.resizable(False, False)
