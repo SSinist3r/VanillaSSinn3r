@@ -78,23 +78,23 @@ def getpids(proc_name):
 '''
 def read_file():
     global config_file
-    if not os.path.exists('config.ini'):
+    if not os.path.exists('VanillaSSinn3rConfig.ini'):
         print ("Config file not found. Creating new config file.")
         config_file['Settings'] = {
             'nameplate_check': 'False',
-            'nameplate_range': '400.00',
+            'nameplate_range': '20.00',
             'fov_check': 'False', 
             'fov_value': '1.5707963267948966',
             'camDist_check': 'False',
             'camDist_value': '50.00',
             }
         write_file()
-    config_file.read('config.ini')
+    config_file.read('VanillaSSinn3rConfig.ini')
     if not config_file.has_section('Settings'):
         print ("Config file is missing settings. Creating new config file.")
         config_file['Settings'] = {
             'nameplate_check': 'False',
-            'nameplate_range': '400.00',
+            'nameplate_range': '20.00',
             'fov_check': 'False', 
             'fov_value': '1.5707963267948966',
             'camDist_check': 'False',
@@ -104,7 +104,7 @@ def read_file():
     return
 def write_file():
     global config_file
-    config_file.write(open('config.ini', 'w'))
+    config_file.write(open('VanillaSSinn3rConfig.ini', 'w'))
 def str2bool(v):
   return v.lower() in ("yes", "true", "t", "1")
 
@@ -439,7 +439,7 @@ def namePlateRangeSlider_Scroll(event):
             p.write_memory(nameplate_offset, ctypes.c_float(math.pow(float(namePlateRangeSlider.get()), 2)))
             config_file['Settings']['nameplate_range'] = str(namePlateRangeSlider.get())
             infoPrint("nameplate", namePlateRangeSlider.get())
-            config_file.write(open('config.ini', 'w'))
+            config_file.write(open('VanillaSSinn3rConfig.ini', 'w'))
             p.close()
 def namePlateCheckBox_Changed():
     global Attached
@@ -449,7 +449,7 @@ def namePlateCheckBox_Changed():
             config_file['Settings']['nameplate_check'] = "True"
         else:
             config_file['Settings']['nameplate_check'] = "False"
-        config_file.write(open('config.ini', 'w'))
+        config_file.write(open('VanillaSSinn3rConfig.ini', 'w'))
         namePlateRangeSlider.set(float(config_file['Settings']['nameplate_range']))
 def fov_btn_clicked():
     global Attached
@@ -460,7 +460,7 @@ def fov_btn_clicked():
             p.write_memory(fov_offset, ctypes.c_float(float(fov_textBox.get())))
             config_file['Settings']['fov_value'] = str(float(fov_textBox.get()))
             infoPrint("fov", float(fov_textBox.get()))
-            config_file.write(open('config.ini', 'w'))
+            config_file.write(open('VanillaSSinn3rConfig.ini', 'w'))
             p.close()
 def fovCheckBox_Changed():
     global Attached
@@ -470,7 +470,7 @@ def fovCheckBox_Changed():
             config_file['Settings']['fov_check'] = "True"
         else:
             config_file['Settings']['fov_check'] = "False"
-        config_file.write(open('config.ini', 'w'))
+        config_file.write(open('VanillaSSinn3rConfig.ini', 'w'))
         fov_textBox.delete(0, END)
         fov_textBox.insert(0, float(config_file['Settings']['fov_value']))
 
@@ -492,7 +492,7 @@ def camDistSlider_Scroll(event):
                     p.write_memory(camDist_offset[1], ctypes.c_float(float(camDistSlider.get())))
 
                 config_file['Settings']['camdist_value'] = str(float(camDistSlider.get()))
-                config_file.write(open('config.ini', 'w'))
+                config_file.write(open('VanillaSSinn3rConfig.ini', 'w'))
                 infoPrint("camera", float(camDistSlider.get()))
                 p.close()
     except Exception as e:
@@ -508,7 +508,7 @@ def cameraCheckBox_Changed():
             config_file['Settings']['camdist_check'] = "True"
         else:
             config_file['Settings']['camdist_check'] = "False"
-        config_file.write(open('config.ini', 'w'))
+        config_file.write(open('VanillaSSinn3rConfig.ini', 'w'))
         camDistSlider.set(float(config_file['Settings']['camdist_value']))
     
 '''
@@ -569,8 +569,11 @@ def saveSettings():
         config_file['Settings']['nameplate_range'] = str(namePlateRangeSlider.get())
     if (fovCheckBoxVar.get()):
         config_file['Settings']['fov_value'] = str(fov_textBox.get())
+    if (camDistCheckBoxVar.get()):
+        config_file['Settings']['camdist_value'] = str(camDistSlider.get())
     config_file['Settings']['nameplate_check'] = str(namePlateCheckBoxVar.get())
-    config_file['Settings']['fov_check'] = str(fovCheckBoxVar.get())   
+    config_file['Settings']['fov_check'] = str(fovCheckBoxVar.get())
+    config_file['Settings']['camdist_check'] = str(camDistCheckBoxVar.get())
     write_file()
     return
 
