@@ -28,8 +28,8 @@ versionChecked = False
 
 tmpPtr = 0x0
 nameplate_offset = (0x0)
-namePlateAddSwitchFrom = (ctypes.c_byte * 8)(216, 29, 136, 217, 196, 0, 221, 216)
-namePlateAddSwitchTo = (ctypes.c_byte * 8)(216, 29, 216, 254, 128, 0, 221, 216)
+namePlateAddSwitchTo_Original = (ctypes.c_byte * 8)(216, 29, 136, 217, 196, 0, 221, 216)
+namePlateAddSwitchTo_New = (ctypes.c_byte * 8)(216, 29, 216, 254, 128, 0, 221, 216)
 fov_offset = (0x0)
 camDist_offset = [0] * 2 # 1: Camera Distance Limit, 2: Camera Distance
 maxcamDist_offset = [0] * 2 # 1: Max Camera Distance, 2: MaxCameraDistance Variable (/console CameraDistanceMax N)
@@ -138,7 +138,7 @@ def Hacks():
             if GameVersion.__contains__("5875"):
                 if not isVanilla:
                     # Switching Nameplate Render Address To FarClip Evaluator From Nameplate Evaluator
-                    p.write_memory(0x60F7B8, namePlateAddSwitchTo)
+                    p.write_memory(0x60F7B8, namePlateAddSwitchTo_New)
                     isVanilla = True
                 # 0xC4D988 hex(12900744) Detected in vMaNGOS
                 nameplate_offset = (0x80FED8) # 0x80FED8 hex(8453848) Now using farclip address for manipulating nameplate range
@@ -557,7 +557,7 @@ def save_n_reset():
     global config_file
     global GameDefaultNameplateRange
     global GameDefaultFOV
-    global namePlateAddSwitchFrom
+    global namePlateAddSwitchTo_Original
     global tmpPtr
     Hacks()
     Attached = False
@@ -574,7 +574,7 @@ def save_n_reset():
                 p.write_memory(camDist_offset[1], ctypes.c_float(GameDefaultCameraDistance))
             if isVanilla:
                 # Switching Back Nameplate Render Address To Nameplate Evaluator From FarClip Evaluator
-                p.write_memory(0x60F7B8, namePlateAddSwitchFrom)
+                p.write_memory(0x60F7B8, namePlateAddSwitchTo_Original)
                 # ============================================================================
                 Attached = True
                 bgSoundCheckBoxVar.set(False)
