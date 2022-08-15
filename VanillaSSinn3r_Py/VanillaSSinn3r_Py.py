@@ -88,6 +88,8 @@ def read_file():
             'fov_value': '1.5707963267948966',
             'camDist_check': 'False',
             'camDist_value': '50.00',
+            'bgSound_check': 'False',
+            'quickloot_check': 'False',
             }
         write_file()
     config_file.read('VanillaSSinn3rConfig.ini')
@@ -100,6 +102,8 @@ def read_file():
             'fov_value': '1.5707963267948966',
             'camDist_check': 'False',
             'camDist_value': '50.00',
+            'bgSound_check': 'False',
+            'quickloot_check': 'False',
             }
         write_file()
     return
@@ -248,6 +252,25 @@ def LoadConfig():
             Print("[>>>>>] Debug: Inside LoadConfig Catch")
     return
 
+def LoadExtraConfig():
+    global config_file
+    global bgSoundCheckBoxVar
+    global bgSoundCheckBox
+    global quicklootCheckBoxVar
+    global quicklootCheckBox
+    global Attached
+    global isVanilla
+    global isTBC
+    global isWotLK
+    if Attached:
+        if isVanilla:
+            bgSoundCheckBoxVar.set(str2bool(config_file['Settings']['bgSound_check']))
+            if bgSoundCheckBoxVar.get():
+                bgSoundCheckBox_Clicked()
+            quicklootCheckBoxVar.set(str2bool(config_file['Settings']['quickloot_check']))
+            if quicklootCheckBoxVar.get():
+                quicklootCheckBox_Clicked()
+
 def Vanilla_Extra_Hacks():
     # Checkbox for Background Sound
     global bgSoundCheckBoxVar
@@ -275,6 +298,7 @@ def LoadExtraHacks():
         if isVanilla:
             master.geometry("600x420")
             Vanilla_Extra_Hacks()
+        LoadExtraConfig()
 
 '''
 ======================================================== Functions for Extra UI ========================================================
@@ -372,7 +396,6 @@ def attach_btn_clicked():
         return
     try:
         pid = int(wow_process.get().split("[")[1].split("]")[0])
-        getAddress(0xBE0E6C, {0x24})
         with Process.open_process(pid) as p:
             ClearLogWin()
             Print("[>] Attaching to " + wow_process.get())
@@ -527,6 +550,8 @@ def save_n_reset():
     global Attached
     global versionChecked
     global isVanilla
+    global isTBC
+    global isWotLK
     global nameplate_offset
     global fov_offset
     global config_file
@@ -540,6 +565,13 @@ def save_n_reset():
     saveSettings()
     try:
         with Process.open_process(pid) as p:
+            p.write_memory(nameplate_offset, ctypes.c_float(float(GameDefaultNameplateRange)))
+            p.write_memory(fov_offset, ctypes.c_float(GameDefaultFOV))
+            p.write_memory(maxcamDist_offset[0], ctypes.c_float(GameDefaultCameraDistanceLimit))
+            if (tmpPtr != 0x0):
+                p.write_memory(maxcamDist_offset[1], ctypes.c_float(GameDefaultCameraDistanceLimit))
+                p.write_memory(camDist_offset[0], ctypes.c_float(GameDefaultCameraDistanceLimit))
+                p.write_memory(camDist_offset[1], ctypes.c_float(GameDefaultCameraDistance))
             if isVanilla:
                 # Switching Back Nameplate Render Address To Nameplate Evaluator From FarClip Evaluator
                 p.write_memory(0x60F7B8, namePlateAddSwitchFrom)
@@ -558,13 +590,10 @@ def save_n_reset():
                 # ============================================================================
                 master.geometry(ui_default_size)
                 isVanilla = False
-            p.write_memory(nameplate_offset, ctypes.c_float(GameDefaultNameplateRange))
-            p.write_memory(fov_offset, ctypes.c_float(GameDefaultFOV))
-            p.write_memory(maxcamDist_offset[0], ctypes.c_float(GameDefaultCameraDistanceLimit))
-            if (tmpPtr != 0x0):
-                p.write_memory(maxcamDist_offset[1], ctypes.c_float(GameDefaultCameraDistanceLimit))
-                p.write_memory(camDist_offset[0], ctypes.c_float(GameDefaultCameraDistanceLimit))
-                p.write_memory(camDist_offset[1], ctypes.c_float(GameDefaultCameraDistance))
+            if isTBC:
+                isTBC = False
+            if isWotLK:
+                isWotLK = False
             p.close()
     except NameError as e:
         if debugCheckBoxVar.get():
@@ -573,6 +602,10 @@ def save_n_reset():
     return
 def saveSettings():
     global config_file
+    global Attached
+    global isVanilla
+    global isTBC
+    global isWotLK
     read_file()
     if (namePlateCheckBoxVar.get()):
         config_file['Settings']['nameplate_range'] = str(int(namePlateRangeSlider.get()))
@@ -583,6 +616,13 @@ def saveSettings():
     config_file['Settings']['nameplate_check'] = str(namePlateCheckBoxVar.get())
     config_file['Settings']['fov_check'] = str(fovCheckBoxVar.get())
     config_file['Settings']['camdist_check'] = str(camDistCheckBoxVar.get())
+    if (isVanilla and Attached):
+        config_file['Settings']['bgSound_check'] = str(bgSoundCheckBoxVar.get())
+        config_file['Settings']['quickloot_check'] = str(quicklootCheckBoxVar.get())
+    if (isTBC and Attached):
+        pass
+    if (isWotLK and Attached):
+        pass
     write_file()
     return
 
