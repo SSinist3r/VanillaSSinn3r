@@ -661,12 +661,18 @@ def on_closing():
 if __name__ == "__main__":
     master = tk.Tk()
     sv_ttk.set_theme("dark") # dark theme
+    n_rows =6
+    n_columns =5
+    for i in range(n_rows):
+        master.grid_rowconfigure(i,  weight =1)
+    for i in range(n_columns):
+        master.grid_columnconfigure(i,  weight =1)
     # master.iconphoto(True, tk.PhotoImage(file='logo.png'))
     # master.iconbitmap('logo.ico')
     # defaultbg = master.cget('bg')
     master.title('VanillaSSinn3r - WoW Vanilla/TBC/WotLK Tool By SSinist3r')
     master.geometry(ui_default_size)
-    master.resizable(False, False)
+    master.resizable(True, True)
 
     # Textbox for Logs
     infobox = Text(master, height = 10, width = 60, bg = "black", fg = "light green", font = ("Prototype", 12, "bold"), state=DISABLED)
