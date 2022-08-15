@@ -1,0 +1,1 @@
+pyinstaller --clean --hidden-import sv_ttk --collect-all sv_ttk -i logo.ico -w --onefile --uac-admin VanillaSSinn3r_Py.py
