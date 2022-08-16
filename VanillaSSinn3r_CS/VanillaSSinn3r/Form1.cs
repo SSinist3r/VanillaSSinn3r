@@ -512,11 +512,6 @@ namespace VanillaSSinn3r
 				freezeCheckBox.Checked = true;
 			}
 			saveSettings();
-			if(isVanilla)
-            {
-				Form1.Sharp.Write<byte>((IntPtr)(0x60F7B8), namePlateAddSwitchFrom, false); // Switching Back Nameplate Render Address To Nameplate Evaluator From FarClip Evaluator
-				isVanilla = false;
-			}
 			Form1.Sharp.Write<float>(Form1.RangeAddy, GameDefaultNameplateRange, false);
 			Form1.Sharp.Write<float>(Form1.FOVAddy, GameDefaultFOV, false);
 			Form1.Sharp.Write<float>(Form1.maxCamDistance[0], GameDefaultCameraDistanceLimit, false);
@@ -525,6 +520,11 @@ namespace VanillaSSinn3r
 				Form1.Sharp.Write<float>(Form1.maxCamDistance[1], GameDefaultCameraDistanceLimit, false);
 				Form1.Sharp.Write<float>(Form1.CamDistAddy[0], GameDefaultCameraDistanceLimit, false);
 				Form1.Sharp.Write<float>(Form1.CamDistAddy[1], GameDefaultCameraDistance, false);
+			}
+			if(isVanilla)
+            {
+				Form1.Sharp.Write<byte>((IntPtr)(0x60F7B8), namePlateAddSwitchFrom, false); // Switching Back Nameplate Render Address To Nameplate Evaluator From FarClip Evaluator
+				isVanilla = false;
 			}
 		}
 
