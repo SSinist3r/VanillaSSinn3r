@@ -88,8 +88,9 @@ def read_file():
             'fov_value': '1.5707963267948966',
             'camDist_check': 'False',
             'camDist_value': '50.00',
-            'bgSound_check': 'False',
             'quickloot_check': 'False',
+            'bgSound_check': 'False',
+            'ctmfpsfix_check': 'False',
             }
         write_file()
     config_file.read('VanillaSSinn3rConfig.ini')
@@ -102,8 +103,9 @@ def read_file():
             'fov_value': '1.5707963267948966',
             'camDist_check': 'False',
             'camDist_value': '50.00',
-            'bgSound_check': 'False',
             'quickloot_check': 'False',
+            'bgSound_check': 'False',
+            'ctmfpsfix_check': 'False',
             }
         write_file()
     return
@@ -258,32 +260,43 @@ def LoadExtraConfig():
     global bgSoundCheckBox
     global quicklootCheckBoxVar
     global quicklootCheckBox
+    global ctmFpsCheckBoxVar
+    global ctmFpsCheckBox
     global Attached
     global isVanilla
     global isTBC
     global isWotLK
     if Attached:
         if isVanilla:
-            bgSoundCheckBoxVar.set(str2bool(config_file['Settings']['bgSound_check']))
-            if bgSoundCheckBoxVar.get():
-                bgSoundCheckBox_Clicked()
             quicklootCheckBoxVar.set(str2bool(config_file['Settings']['quickloot_check']))
             if quicklootCheckBoxVar.get():
                 quicklootCheckBox_Clicked()
+            bgSoundCheckBoxVar.set(str2bool(config_file['Settings']['bgSound_check']))
+            if bgSoundCheckBoxVar.get():
+                bgSoundCheckBox_Clicked()
+            ctmFpsCheckBoxVar.set(str2bool(config_file['Settings']['ctmfpsfix_check']))
+            if ctmFpsCheckBoxVar.get():
+                ctmFpsCheckBox_Clicked()
 
 def Vanilla_Extra_Hacks():
-    # Checkbox for Background Sound
-    global bgSoundCheckBoxVar
-    global bgSoundCheckBox
-    bgSoundCheckBoxVar = BooleanVar(False)
-    bgSoundCheckBox = ttk.Checkbutton(master, text="Sound in Background", variable=bgSoundCheckBoxVar, command=bgSoundCheckBox_Clicked)
-    bgSoundCheckBox.grid(row=6, column=0, columnspan=100, sticky=W)
     # Checkbox for Quickloot
     global quicklootCheckBoxVar
     global quicklootCheckBox
     quicklootCheckBoxVar = BooleanVar(False)
     quicklootCheckBox = ttk.Checkbutton(master, text="Quickloot", variable=quicklootCheckBoxVar, command=quicklootCheckBox_Clicked)
-    quicklootCheckBox.grid(row=6, column=1, columnspan=100, sticky=W)
+    quicklootCheckBox.grid(row=6, column=0, columnspan=100, sticky=W)
+    # Checkbox for Background Sound
+    global bgSoundCheckBoxVar
+    global bgSoundCheckBox
+    bgSoundCheckBoxVar = BooleanVar(False)
+    bgSoundCheckBox = ttk.Checkbutton(master, text="Sound in Background", variable=bgSoundCheckBoxVar, command=bgSoundCheckBox_Clicked)
+    bgSoundCheckBox.grid(row=6, column=1, columnspan=100, sticky=W)
+    # Checkbox for CTM FPS Fix
+    global ctmFpsCheckBoxVar
+    global ctmFpsCheckBox
+    ctmFpsCheckBoxVar = BooleanVar(False)
+    ctmFpsCheckBox = ttk.Checkbutton(master, text="CTM FPS Fix", variable=ctmFpsCheckBoxVar, command=ctmFpsCheckBox_Clicked)
+    ctmFpsCheckBox.grid(row=6, column=2, columnspan=100, sticky=W)
 
 def TBC_Extra_Hacks():
     pass
@@ -333,6 +346,21 @@ def quicklootCheckBox_Clicked():
                 p.write_memory(0x4C2B25, ctypes.c_byte(116))
                 # quicklootCheckBox.config(bg=defaultbg)
                 Print("[>] Disabled: Quickloot")
+            p.close()
+
+def ctmFpsCheckBox_Clicked():
+    global Attached
+    global ctmFpsCheckBoxVar
+    if Attached:
+        with Process.open_process(pid) as p:
+            if ctmFpsCheckBoxVar.get():
+                p.write_memory(0x610D86, ctypes.c_byte(0x7F))
+                p.write_memory(0x610D89, ctypes.c_byte(0xEB))
+                Print("[>] Enabled: CTM FPS Fix")
+            else:
+                p.write_memory(0x610D86, ctypes.c_byte(0x41))
+                p.write_memory(0x610D89, ctypes.c_byte(0x75))
+                Print("[>] Disabled: CTM FPS Fix")
             p.close()
 
 '''
@@ -577,15 +605,20 @@ def save_n_reset():
                 p.write_memory(0x60F7B8, namePlateAddSwitchTo_Original)
                 # ============================================================================
                 Attached = True
+                quicklootCheckBoxVar.set(False)
+                # called this function to reset the quickloot memory value
+                quicklootCheckBox_Clicked()
+                quicklootCheckBox.destroy()
+
                 bgSoundCheckBoxVar.set(False)
                 # called this function to reset the bg sound memory value
                 bgSoundCheckBox_Clicked()
                 bgSoundCheckBox.destroy()
 
-                quicklootCheckBoxVar.set(False)
-                # called this function to reset the quickloot memory value
-                quicklootCheckBox_Clicked()
-                quicklootCheckBox.destroy()
+                ctmFpsCheckBoxVar.set(False)
+                # called this function to reset the ctm fps memory value
+                ctmFpsCheckBox_Clicked()
+                ctmFpsCheckBox.destroy()
                 Attached = False
                 # ============================================================================
                 master.geometry(ui_default_size)
@@ -619,6 +652,7 @@ def saveSettings():
     if (isVanilla and Attached):
         config_file['Settings']['bgSound_check'] = str(bgSoundCheckBoxVar.get())
         config_file['Settings']['quickloot_check'] = str(quicklootCheckBoxVar.get())
+        config_file['Settings']['ctmfpsfix_check'] = str(ctmFpsCheckBoxVar.get())
     if (isTBC and Attached):
         pass
     if (isWotLK and Attached):
